@@ -1,0 +1,7 @@
+[user]
+	name = Robert Piringiu
+	email = robert.piringiu@emag.ro
+[pull]
+	rebase = false
+[core]
+	excludesfile = ~/.gitignore

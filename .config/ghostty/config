@@ -1,4 +1,5 @@
 theme=Material
+app-notifications=false
 gtk-titlebar=false
 # background-opacity=0.85
 gtk-tabs-location=bottom

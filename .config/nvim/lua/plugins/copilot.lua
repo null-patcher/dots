@@ -29,6 +29,7 @@ return {
       require("copilot").setup({
         suggestion = { enabled = false },
         panel = { enabled = false },
+        copilot_model = "claude-3.5-sonnet",
       })
     end,
   },

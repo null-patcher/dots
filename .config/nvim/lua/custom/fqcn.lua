@@ -17,7 +17,7 @@ function M.copy_method_reference()
 
   local method_reference = ""
   local query = vim.treesitter.query.parse(vim.bo.filetype, query_str)
-  for _, matches, _ in query:iter_matches(tree_root) do
+  for _, matches, _ in query:iter_matches(tree_root, 0, nil, nil, {all = false}) do
     local node = matches[1]
     if nil ~= node then
       -- Concat the node text

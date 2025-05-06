@@ -209,10 +209,24 @@ export NVM_DIR="$HOME/.nvm"
 export VISUAL=nvim
 export EDITOR="$VISUAL"
 
-export FZF_ALT_C_COMMAND="fd . $HOME --type directory"
+export FZF_ALT_C_COMMAND="fd . $HOME --type directory --hidden"
 source <(fzf --bash)
+
+__fzf_vim__() {
+  local dir
+  dir=$(
+    FZF_DEFAULT_COMMAND=${FZF_ALT_C_COMMAND:-} \
+    FZF_DEFAULT_OPTS=$(__fzf_defaults "--reverse --walker=dir,follow,hidden --scheme=path" "${FZF_ALT_C_OPTS-} +m") \
+    FZF_DEFAULT_OPTS_FILE='' $(__fzfcmd)
+  ) && printf 'builtin cd -- %q && vim' "$(builtin unset CDPATH && builtin cd -- "$dir" && builtin pwd)"
+}
+
 bind -m emacs-standard '"\C-f": " \C-b\C-k \C-u`__fzf_cd__`\e\C-e\er\C-m\C-y\C-h\e \C-y\ey\C-x\C-x\C-d"'
 bind -m vi-command '"\C-f": "\C-z\C-f\C-z"'
 bind -m vi-insert '"\C-f": "\C-z\C-f\C-z"'
+
+bind -m emacs-standard '"\C-v": " \C-b\C-k \C-u`__fzf_vim__`\e\C-e\er\C-m\C-y\C-h\e \C-y\ey\C-x\C-x\C-d"'
+bind -m vi-command '"\C-v": "\C-z\C-v\C-z"'
+bind -m vi-insert '"\C-v": "\C-z\C-v\C-z"'
 
 source <(kubectl completion bash)

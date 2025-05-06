@@ -40,9 +40,7 @@ Videos
 .zshenv
 .zshrc
 !code
-!.config/nvim
-!.config/ghostty
-!.config/cosmic
+!.config
 !Documents
 !Downloads
 !.gitconfig

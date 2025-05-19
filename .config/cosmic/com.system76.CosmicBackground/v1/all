@@ -1,6 +1,6 @@
 (
     output: "all",
-    source: Path("/home/robert-piringiu/code/personal/dots/wallpaper/wallpaperflare.com_wallpaper.jpg"),
+    source: Path("/home/robert/code/personal/dots/wallpaper/wallpaperflare.com_wallpaper (4).jpg"),
     filter_by_theme: true,
     rotation_frequency: 300,
     filter_method: Lanczos,

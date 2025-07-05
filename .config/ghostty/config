@@ -1,11 +1,12 @@
-theme=tokyonight-day
+theme=Adwaita
 app-notifications=false
 gtk-titlebar=false
-background-opacity=0.85
+# background-opacity=1.0
 # gtk-tabs-location=bottom
-font-size=15
-window-padding-y=8
-window-padding-x=8
+command=tmux attach || tmux
+font-size=14
+# window-padding-y=8
+# window-padding-x=8
 window-padding-balance=true
 copy-on-select=clipboard
 gtk-wide-tabs=false
@@ -13,10 +14,15 @@ gtk-wide-tabs=false
 font-feature=-calt
 font-feature=-liga
 font-feature=-dlig
-keybind = ctrl+alt+h=goto_split:left
-keybind = ctrl+alt+j=goto_split:down
-keybind = ctrl+alt+k=goto_split:up
-keybind = ctrl+alt+l=goto_split:right
-keybind = ctrl+alt+o=new_split:down
-keybind = ctrl+alt+i=new_split:right
-keybind = ctrl+alt+x=close_surface
+# keybind = ctrl+alt+h=goto_split:left
+# keybind = ctrl+alt+j=goto_split:down
+# keybind = ctrl+alt+k=goto_split:up
+# keybind = ctrl+alt+l=goto_split:right
+# keybind = ctrl+alt+o=new_split:down
+# keybind = ctrl+alt+i=new_split:right
+# keybind = ctrl+alt+x=close_surface
+keybind = alt+1=unbind
+keybind = alt+2=unbind
+keybind = alt+3=unbind
+keybind = alt+4=unbind
+keybind = alt+5=unbind

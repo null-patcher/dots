@@ -1,5 +1,6 @@
 .phpactor.json
 .config/nvim/lazygit*
 .vim-arsync
+.vim-arsync.bkp
 .config/zsh/zsh-syntax-highlighting
 .config/zsh/plugins/zsh-autosuggestions

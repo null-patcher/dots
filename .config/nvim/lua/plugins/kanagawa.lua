@@ -72,30 +72,30 @@ return {
   --     vim.cmd.colorscheme("catppuccin")
   --   end,
   -- },
-  -- {
-  --   "navarasu/onedark.nvim",
-  --   name = "onedark",
-  --   priority = 1000,
-  --   opts = {
-  --     style = "light",
-  --     transparent = true,
-  --   },
-  --   config = function(_, opts)
-  --     require("onedark").setup(opts)
-  --     vim.cmd.colorscheme("onedark")
-  --   end,
-  -- },
   {
-    "Mofiqul/adwaita.nvim",
-    lazy = false,
+    "navarasu/onedark.nvim",
+    name = "onedark",
     priority = 1000,
-
-    -- configure and set on startup
-    config = function()
-      -- vim.g.adwaita_darker = true -- for darker version
-      -- vim.g.adwaita_disable_cursorline = true -- to disable cursorline
-      -- vim.g.adwaita_transparent = true -- makes the background transparent
-      vim.cmd.colorscheme("adwaita")
+    opts = {
+      -- style = "light",
+      transparent = true,
+    },
+    config = function(_, opts)
+      require("onedark").setup(opts)
+      vim.cmd.colorscheme("onedark")
     end,
   },
+  -- {
+  --   "Mofiqul/adwaita.nvim",
+  --   lazy = false,
+  --   priority = 1000,
+  --
+  --   -- configure and set on startup
+  --   config = function()
+  --     -- vim.g.adwaita_darker = true -- for darker version
+  --     -- vim.g.adwaita_disable_cursorline = true -- to disable cursorline
+  --     -- vim.g.adwaita_transparent = true -- makes the background transparent
+  --     vim.cmd.colorscheme("adwaita")
+  --   end,
+  -- },
 }

@@ -6,7 +6,7 @@ opt.expandtab = true
 opt.smartindent = true
 opt.tabstop = 4
 opt.shiftwidth = 4
-opt.background = "light"
+opt.background = "dark"
 
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "

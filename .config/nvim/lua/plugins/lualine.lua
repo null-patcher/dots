@@ -5,7 +5,7 @@ return {
     -- [[ Configure Lualine ]]
     -- See `:help lualine` and `:help lualine.setup()`
 
-    opts.theme = "adwaita"
+    opts.theme = "onedark"
     opts.disabled_filetypes = {
       "lazy",
       "mason",

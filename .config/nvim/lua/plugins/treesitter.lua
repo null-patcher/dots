@@ -8,6 +8,7 @@ return { -- Highlight, edit, and navigate code
       "html",
       "http",
       "lua",
+      "go",
       "javascript",
       "typescript",
       "json",

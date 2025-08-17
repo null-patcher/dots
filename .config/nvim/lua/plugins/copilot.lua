@@ -96,8 +96,8 @@ return {
         },
         -- Submit the prompt to Copilot
         submit_prompt = {
-          normal = "<CR>",
-          insert = "<C-CR>",
+          normal = "<C-y>",
+          insert = "<C-y>",
         },
         -- Accept the diff
         accept_diff = {

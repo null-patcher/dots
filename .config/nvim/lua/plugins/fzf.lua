@@ -1,8 +1,8 @@
 return {
   "ibhagwan/fzf-lua",
-  -- cond = function()
-  --   return vim.g.picker == "FzfLua"
-  -- end,
+  cond = function()
+    return vim.g.picker == "FzfLua"
+  end,
   opts = {
     oldfiles = {
       winopts = {

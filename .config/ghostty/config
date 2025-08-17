@@ -1,9 +1,10 @@
 theme=Atom
 app-notifications=false
 gtk-titlebar=false
-background-opacity=0.9
+background-opacity=0.8
 # gtk-tabs-location=bottom
 # command=tmux attach || tmux
+gtk-adwaita=false
 font-size=15
 window-padding-y=4
 window-padding-x=4

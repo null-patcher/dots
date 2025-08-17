@@ -1,7 +1,7 @@
 return { -- Fuzzy Finder (files, lsp, etc)
   "nvim-telescope/telescope.nvim",
   cond = function()
-    return false -- vim.g.picker == "Telescope"
+    return vim.g.picker == "Telescope"
   end,
   event = "VimEnter",
   dependencies = {

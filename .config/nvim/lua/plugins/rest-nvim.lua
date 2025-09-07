@@ -1,6 +1,5 @@
 return {
   "rest-nvim/rest.nvim",
-  branch = "view-request-headers",
   dependencies = {
     "nvim-treesitter/nvim-treesitter",
     opts = function(_, opts)

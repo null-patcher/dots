@@ -7,7 +7,7 @@ opt.smartindent = true
 opt.tabstop = 4
 opt.shiftwidth = 4
 opt.background = "dark"
-vim.g.picker = "Telescope"
+vim.g.picker = "FzfLua"
 
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "

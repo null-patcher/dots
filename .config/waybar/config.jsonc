@@ -15,13 +15,14 @@
         // "sway/scratchpad"
     ],
     "modules-center": [
-        "hyprland/window"
+        "clock"
+        // "hyprland/window"
     ],
     "modules-right": [
         "tray",
         "idle_inhibitor",
         "pulseaudio",
-        "network",
+        // "network",
         "power-profiles-daemon",
         // "cpu",
         // "memory",
@@ -29,7 +30,6 @@
         // "backlight",
         // "hyprland/language",
         "battery",
-        "clock"
     ],
     // Modules configuration
     // "sway/workspaces": {
@@ -111,9 +111,9 @@
     "clock": {
         // "timezone": "America/New_York",
         "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
-        "format": "{:%H:%M:%S}",
+        "format": "{:%d | %H:%M:%S}",
         "interval": 1,
-        "format-alt": "{:%Y-%m-%d}"
+        // "format-alt": "{:%Y-%m-%d}"
     },
     "cpu": {
         "format": "{usage}% ",

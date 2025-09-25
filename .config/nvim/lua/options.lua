@@ -1,19 +1,18 @@
 -- Options are automatically loaded before lazy.nvim startup
 -- Default options that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/options.lua
 -- Add any additional options here
-local opt = vim.opt
-opt.expandtab = true
-opt.smartindent = true
-opt.tabstop = 4
-opt.shiftwidth = 4
-opt.background = "dark"
-vim.g.picker = "FzfLua"
+vim.o.expandtab = true
+vim.o.smartindent = true
+vim.o.tabstop = 4
+vim.o.shiftwidth = 4
+vim.o.background = "dark"
+vim.g.picker = "Telescope"
 
 vim.g.mapleader = " "
-vim.g.maplocalleader = " "
-
+vim.g.netrw_liststyle = 3
 -- Set to true if you have a Nerd Font installed
 vim.g.have_nerd_font = true
+vim.g.netrw_banner = 0
 
 -- [[ Setting options ]]
 -- See `:help vim.opt`
@@ -32,7 +31,18 @@ vim.opt.mouse = "a"
 -- Don't show the mode, since it's already in the status line
 vim.opt.showmode = false
 vim.opt.showmatch = false
-vim.opt.shortmess:append({ a = true, F = true, S = true, W = true, I = true, c = true, C = true, O = true })
+vim.opt.shortmess:append({
+  o = true,
+  T = true,
+  a = true,
+  F = true,
+  S = true,
+  W = true,
+  I = true,
+  c = true,
+  C = true,
+  O = true,
+})
 
 -- Sync clipboard between OS and Neovim.
 --  Remove this option if you want your OS clipboard to remain independent.
@@ -53,11 +63,11 @@ vim.opt.smartcase = true
 vim.opt.signcolumn = "yes"
 
 -- Decrease update time
-vim.opt.updatetime = 50
+vim.opt.updatetime = 49
 
 -- Decrease mapped sequence wait time
 -- Displays which-key popup sooner
-vim.opt.timeoutlen = 300
+vim.opt.timeoutlen = 250
 
 -- Configure how new splits should be opened
 vim.opt.splitright = true
@@ -78,13 +88,18 @@ vim.opt.cursorline = true
 -- Minimal number of screen lines to keep above and below the cursor.
 vim.opt.scrolloff = 10
 
-vim.opt.hlsearch = true
-
+vim.opt.hlsearch = false
 vim.opt.grepprg = "rg --vimgrep"
 vim.opt.smoothscroll = true
 vim.opt.termguicolors = true
-vim.opt.wrap = true
-vim.opt.colorcolumn = "120"
+vim.opt.wrap = false
+vim.opt.colorcolumn = "100"
 vim.opt.undofile = true
-vim.opt.textwidth = 120
-
+vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
+vim.opt.textwidth = 100
+vim.opt.swapfile = false
+vim.opt.backup = false
+vim.opt.isfname:append("@-@")
+vim.o.winborder = "rounded"
+vim.o.showmode = true
+vim.cmd("colorscheme default")

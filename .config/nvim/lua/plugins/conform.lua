@@ -33,10 +33,10 @@ return {
         end,
 
         -- -- There is also built in support in phpactor
-        -- php = function()
-        --   ensure_installed("php_cs_fixer", "php-cs-fixer")
-        --   return { "php_cs_fixer" }
-        -- end,
+        php = function()
+          ensure_installed("php_cs_fixer", "php-cs-fixer")
+          return { "php-cs-fixer" }
+        end,
 
         sql = function()
           ensure_installed("sqlfluff")
@@ -57,7 +57,7 @@ return {
   end,
   keys = {
     {
-      "<leader>cf",
+      "<leader>f",
       function()
         require("conform").format({ async = false, lsp_fallback = true, quiet = false })
       end,

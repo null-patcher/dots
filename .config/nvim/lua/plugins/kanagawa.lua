@@ -72,17 +72,32 @@ return {
   --     vim.cmd.colorscheme("catppuccin")
   --   end,
   -- },
+  -- {
+  --   "navarasu/onedark.nvim",
+  --   name = "onedark",
+  --   priority = 1000,
+  --   opts = {
+  --     -- style = "light",
+  --     transparent = true,
+  --   },
+  --   config = function(_, opts)
+  --     require("onedark").setup(opts)
+  --     vim.cmd.colorscheme("onedark")
+  --   end,
+  -- },
   {
-    "navarasu/onedark.nvim",
-    name = "onedark",
-    priority = 1000,
-    opts = {
-      -- style = "light",
-      transparent = true,
-    },
-    config = function(_, opts)
-      require("onedark").setup(opts)
-      vim.cmd.colorscheme("onedark")
+    "shaunsingh/nord.nvim",
+    enabled = false,
+    config = function()
+      vim.g.nord_contrast = true
+      -- vim.g.nord_borders = false
+      vim.g.nord_disable_background = true
+      vim.g.nord_italic = false
+      vim.g.nord_uniform_diff_background = true
+      vim.g.nord_bold = false
+
+      -- Load the colorscheme
+      require("nord").set()
     end,
   },
   -- {

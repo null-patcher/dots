@@ -1,0 +1,949 @@
+-- ~/.config/nvim/init.lua
+-- Comprehensive development environment for PHP, TypeScript, MySQL, Bash, Docker
+-- Updated with: Rose-pine theme, LazyGit, fixed Phpactor, transparent background, improved Telescope
+
+-- Bootstrap lazy.nvim
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not (vim.uv or vim.loop).fs_stat(lazypath) then
+    local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+    local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+    if vim.v.shell_error ~= 0 then
+        vim.api.nvim_echo({
+            { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+            { out,                            "WarningMsg" },
+            { "\nPress any key to exit..." },
+        }, true, {})
+        vim.fn.getchar()
+        os.exit(1)
+    end
+end
+vim.opt.rtp:prepend(lazypath)
+
+
+-- =============================================================================
+-- BASIC SETTINGS
+-- =============================================================================
+
+-- Leader keys
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
+
+-- Disable netrw
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
+-- Essential settings
+vim.opt.number = true
+vim.opt.relativenumber = true
+vim.opt.expandtab = true
+vim.opt.shiftwidth = 4
+vim.opt.tabstop = 4
+vim.opt.smartindent = true
+vim.opt.wrap = false
+vim.opt.swapfile = false
+vim.opt.backup = false
+vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
+vim.opt.undofile = true
+vim.opt.hlsearch = false
+vim.opt.incsearch = true
+vim.opt.termguicolors = true
+vim.opt.scrolloff = 8
+vim.opt.signcolumn = "yes"
+vim.opt.updatetime = 50
+vim.opt.colorcolumn = "120"
+
+-- System clipboard integration (Linux)
+vim.opt.clipboard = "unnamedplus"
+
+-- Transparent background
+vim.api.nvim_create_autocmd("ColorScheme", {
+    pattern = "*",
+    callback = function()
+        vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+        vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+        vim.api.nvim_set_hl(0, "NormalNC", { bg = "none" })
+        vim.api.nvim_set_hl(0, "LineNr", { bg = "none" })
+        vim.api.nvim_set_hl(0, "SignColumn", { bg = "none" })
+        vim.api.nvim_set_hl(0, "StatusLine", { bg = "none" })
+        vim.api.nvim_set_hl(0, "StatusLineNC", { bg = "none" })
+    end,
+})
+
+-- File-specific settings
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "typescript", "javascript", "json", "html", "css", "yaml" },
+    callback = function()
+        vim.opt_local.shiftwidth = 2
+        vim.opt_local.tabstop = 2
+    end,
+})
+
+-- =============================================================================
+-- PLUGIN CONFIGURATION
+-- =============================================================================
+
+require("lazy").setup({
+
+    -- Rose Pine Colorscheme
+    {
+        "rose-pine/neovim",
+        name = "rose-pine",
+        priority = 1000,
+        config = function()
+            require("rose-pine").setup({
+                variant = "auto",
+                dark_variant = "main",
+                dim_inactive_windows = false,
+                extend_background_behind_borders = true,
+                enable = {
+                    terminal = true,
+                    legacy_highlights = true,
+                    migrations = true,
+                },
+                styles = {
+                    bold = true,
+                    italic = true,
+                    transparency = true,
+                },
+                groups = {
+                    border = "muted",
+                    link = "iris",
+                    panel = "surface",
+                    error = "love",
+                    hint = "iris",
+                    info = "foam",
+                    note = "pine",
+                    todo = "rose",
+                    warn = "gold",
+                    git_add = "foam",
+                    git_change = "rose",
+                    git_delete = "love",
+                    git_dirty = "rose",
+                    git_ignore = "muted",
+                    git_merge = "iris",
+                    git_rename = "pine",
+                    git_stage = "iris",
+                    git_text = "rose",
+                    git_untracked = "subtle",
+                    h1 = "iris",
+                    h2 = "foam",
+                    h3 = "rose",
+                    h4 = "gold",
+                    h5 = "pine",
+                    h6 = "foam",
+                },
+            })
+            vim.cmd("colorscheme rose-pine")
+        end,
+    },
+
+    -- Session Persistence
+    {
+        "folke/persistence.nvim",
+        event = "BufReadPre",
+        config = function()
+            require("persistence").setup({
+                dir = vim.fn.expand(vim.fn.stdpath("state") .. "/sessions/"),
+                options = { "buffers", "curdir", "tabpages", "winsize", "help", "globals", "skiprtp" },
+            })
+
+            local function get_session_name()
+                local cwd = vim.fn.getcwd()
+                local cwd_name = vim.fn.fnamemodify(cwd, ":t")
+
+                local git_branch = ""
+                local handle = io.popen("cd " .. cwd .. " && git branch --show-current 2>/dev/null")
+                if handle then
+                    git_branch = handle:read("*a"):gsub("\n", "")
+                    handle:close()
+                end
+
+                local session_name = cwd_name
+                if git_branch ~= "" then
+                    session_name = cwd_name .. "_" .. git_branch
+                end
+
+                return session_name:gsub("[^%w_-]", "_")
+            end
+
+            vim.api.nvim_create_autocmd("VimLeavePre", {
+                callback = function()
+                    local session_name = get_session_name()
+                    require("persistence").save(session_name)
+                end,
+            })
+
+            vim.api.nvim_create_autocmd("VimEnter", {
+                nested = true,
+                callback = function()
+                    if vim.fn.argc() == 0 then
+                        local session_name = get_session_name()
+                        require("persistence").load(session_name)
+                    end
+                end,
+            })
+
+            -- Session and quit keymaps
+            vim.keymap.set("n", "<leader>qs", function()
+                local session_name = get_session_name()
+                require("persistence").save(session_name)
+                print("Session saved: " .. session_name)
+            end, { desc = "Save current session" })
+
+            vim.keymap.set("n", "<leader>ql", function()
+                local session_name = get_session_name()
+                require("persistence").load(session_name)
+                print("Session loaded: " .. session_name)
+            end, { desc = "Load current session" })
+
+            vim.keymap.set("n", "<leader>qd", function()
+                require("persistence").stop()
+                print("Session recording stopped")
+            end, { desc = "Stop session recording" })
+        end,
+    },
+
+    -- LazyGit Integration
+    {
+        "kdheepak/lazygit.nvim",
+        dependencies = {
+            "nvim-telescope/telescope.nvim",
+            "nvim-lua/plenary.nvim",
+        },
+        config = function()
+            require("telescope").load_extension("lazygit")
+            vim.keymap.set("n", "<leader>gg", "<cmd>LazyGit<cr>", { desc = "LazyGit" })
+        end,
+    },
+
+    -- Which-Key
+    {
+        "folke/which-key.nvim",
+        event = "VeryLazy",
+        config = function()
+            require("which-key").setup({
+                plugins = {
+                    marks = true,
+                    registers = true,
+                    spelling = { enabled = true, suggestions = 20 },
+                },
+                window = {
+                    border = "rounded",
+                    position = "bottom",
+                    margin = { 1, 0, 1, 0 },
+                    padding = { 2, 2, 2, 2 },
+                    winblend = 0
+                },
+                layout = {
+                    height = { min = 4, max = 25 },
+                    width = { min = 20, max = 50 },
+                    spacing = 3,
+                    align = "left",
+                },
+            })
+
+            require("which-key").register({
+                { "<leader>b", group = "Buffers" },
+                { "<leader>c", group = "Code/Comments/AI" },
+                { "<leader>d", group = "Debug/Docker" },
+                { "<leader>e", group = "Explorer/Edit" },
+                { "<leader>f", group = "Find/Files (Telescope)" },
+                { "<leader>g", group = "Git/LazyGit" },
+                { "<leader>h", group = "HTTP/Help" },
+                { "<leader>l", group = "LSP" },
+                { "<leader>n", group = "Notes" },
+                { "<leader>q", group = "Session/Quit" },
+                { "<leader>t", group = "Terminal/Tests" },
+                { "<leader>w", group = "Windows" },
+                { "<leader>x", group = "Formatting/Fix" },
+            })
+        end,
+    },
+
+    -- Neo-tree File Explorer
+    {
+        "nvim-neo-tree/neo-tree.nvim",
+        branch = "v3.x",
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            "nvim-tree/nvim-web-devicons",
+            "MunifTanjim/nui.nvim",
+        },
+        config = function()
+            require("neo-tree").setup({
+                close_if_last_window = false,
+                popup_border_style = "rounded",
+                enable_git_status = true,
+                enable_diagnostics = true,
+                default_component_configs = {
+                    container = { enable_character_fade = true },
+                    indent = {
+                        indent_size = 2,
+                        padding = 1,
+                        with_markers = true,
+                        indent_marker = "│",
+                        last_indent_marker = "└",
+                        highlight = "NeoTreeIndentMarker",
+                        expander_collapsed = "",
+                        expander_expanded = "",
+                        expander_highlight = "NeoTreeExpander",
+                    },
+                    icon = {
+                        folder_closed = "",
+                        folder_open = "",
+                        folder_empty = "ﰊ",
+                        default = "*",
+                        highlight = "NeoTreeFileIcon"
+                    },
+                    name = {
+                        trailing_slash = false,
+                        use_git_status_colors = true,
+                        highlight = "NeoTreeFileName",
+                    },
+                    git_status = {
+                        symbols = {
+                            added = "✚",
+                            modified = "",
+                            deleted = "✖",
+                            renamed = "",
+                            untracked = "",
+                            ignored = "",
+                            unstaged = "",
+                            staged = "",
+                            conflict = "",
+                        }
+                    },
+                },
+                window = {
+                    position = "left",
+                    width = 40,
+                },
+                filesystem = {
+                    filtered_items = {
+                        visible = false,
+                        hide_dotfiles = true,
+                        hide_gitignored = true,
+                        hide_by_name = { "node_modules" },
+                        always_show = { ".gitignored", ".env" },
+                        never_show = { ".DS_Store", "thumbs.db" },
+                    },
+                },
+            })
+
+            vim.keymap.set('n', '<leader>ee', ':Neotree toggle<CR>', { desc = "Toggle file explorer" })
+            vim.keymap.set('n', '<leader>ef', ':Neotree focus<CR>', { desc = "Focus file explorer" })
+            vim.keymap.set('n', '<leader>eg', ':Neotree float git_status<CR>', { desc = "Git status" })
+            vim.keymap.set('n', '<leader>eb', ':Neotree toggle show buffers right<CR>', { desc = "Buffer explorer" })
+        end,
+    },
+
+    -- Telescope with Custom Navigation
+    {
+        'nvim-telescope/telescope.nvim',
+        tag = '0.1.8',
+        dependencies = {
+            'nvim-lua/plenary.nvim',
+            'nvim-tree/nvim-web-devicons',
+            { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+        },
+        config = function()
+            local telescope = require('telescope')
+            local actions = require('telescope.actions')
+
+            telescope.setup({
+                defaults = {
+                    prompt_prefix = "🔍 ",
+                    selection_caret = "➤ ",
+                    entry_prefix = "  ",
+                    initial_mode = "insert",
+                    selection_strategy = "reset",
+                    sorting_strategy = "ascending",
+                    layout_strategy = "horizontal",
+                    layout_config = {
+                        horizontal = {
+                            mirror = false,
+                            preview_width = 0.55,
+                            results_width = 0.8,
+                        },
+                        width = 0.95,
+                        height = 0.85,
+                        preview_cutoff = 120,
+                        prompt_position = "top",
+                    },
+                    mappings = {
+                        i = {
+                            -- Custom navigation: C-n/C-p for movement, C-y for selection
+                            ["<C-n>"] = actions.move_selection_next,
+                            ["<C-p>"] = actions.move_selection_previous,
+                            ["<C-y>"] = actions.select_default,
+                            ["<C-c>"] = actions.close,
+                            ["<Down>"] = actions.move_selection_next,
+                            ["<Up>"] = actions.move_selection_previous,
+                            ["<CR>"] = actions.select_default,
+                            ["<C-x>"] = actions.select_horizontal,
+                            ["<C-v>"] = actions.select_vertical,
+                            ["<C-t>"] = actions.select_tab,
+                        },
+                        n = {
+                            ["<esc>"] = actions.close,
+                            ["<C-y>"] = actions.select_default,
+                            ["<CR>"] = actions.select_default,
+                            ["j"] = actions.move_selection_next,
+                            ["k"] = actions.move_selection_previous,
+                        },
+                    },
+                },
+                pickers = {
+                    find_files = {
+                        find_command = { "rg", "--files", "--hidden", "--glob", "!**/.git/*" },
+                    },
+                    live_grep = {
+                        additional_args = function()
+                            return { "--hidden", "--glob", "!**/.git/*" }
+                        end
+                    },
+                },
+                extensions = {
+                    fzf = {
+                        fuzzy = true,
+                        override_generic_sorter = true,
+                        override_file_sorter = true,
+                        case_mode = "smart_case",
+                    }
+                }
+            })
+
+            telescope.load_extension('fzf')
+
+            local builtin = require('telescope.builtin')
+
+            -- Main telescope keymaps
+            vim.keymap.set('n', '<leader>ff', builtin.find_files, { desc = 'Find files' })
+            vim.keymap.set('n', '<leader>fg', builtin.live_grep, { desc = 'Live grep' })
+            vim.keymap.set('n', '<leader>fb', builtin.buffers, { desc = 'Find buffers' })
+            vim.keymap.set('n', '<leader>fh', builtin.help_tags, { desc = 'Help tags' })
+            vim.keymap.set('n', '<leader>fr', builtin.oldfiles, { desc = 'Recent files' })
+            vim.keymap.set('n', '<leader>fc', builtin.commands, { desc = 'Commands' })
+            vim.keymap.set('n', '<leader>fk', builtin.keymaps, { desc = 'Keymaps' })
+            vim.keymap.set('n', '<leader>fs', builtin.grep_string, { desc = 'Grep string under cursor' })
+
+            -- Language-specific searches
+            vim.keymap.set('n', '<leader>fp', function()
+                builtin.find_files({
+                    prompt_title = "PHP Files",
+                    find_command = { "rg", "--files", "--type", "php" }
+                })
+            end, { desc = 'Find PHP files' })
+
+            vim.keymap.set('n', '<leader>ft', function()
+                builtin.find_files({
+                    prompt_title = "TypeScript Files",
+                    find_command = { "rg", "--files", "--type", "ts", "--type", "js", "--type", "tsx", "--type", "jsx" }
+                })
+            end, { desc = 'Find TypeScript/JS files' })
+
+            vim.keymap.set('n', '<leader>fd', function()
+                builtin.find_files({
+                    prompt_title = "Docker Files",
+                    find_command = { "rg", "--files", "--glob", "*docker*", "--glob", "*.dockerfile", "--glob", "Dockerfile*" }
+                })
+            end, { desc = 'Find Docker files' })
+
+            vim.keymap.set('n', '<leader>fq', function()
+                builtin.find_files({
+                    prompt_title = "SQL Files",
+                    find_command = { "rg", "--files", "--glob", "*.sql", "--glob", "*.mysql" }
+                })
+            end, { desc = 'Find SQL files' })
+
+            -- Git integration
+            vim.keymap.set('n', '<leader>gc', builtin.git_commits, { desc = 'Git commits' })
+            vim.keymap.set('n', '<leader>gb', builtin.git_branches, { desc = 'Git branches' })
+            vim.keymap.set('n', '<leader>gs', builtin.git_status, { desc = 'Git status' })
+
+            -- LSP integration
+            vim.keymap.set('n', '<leader>lr', builtin.lsp_references, { desc = 'LSP references' })
+            vim.keymap.set('n', '<leader>ld', builtin.lsp_definitions, { desc = 'LSP definitions' })
+            vim.keymap.set('n', '<leader>li', builtin.lsp_implementations, { desc = 'LSP implementations' })
+            vim.keymap.set('n', '<leader>ls', builtin.lsp_document_symbols, { desc = 'Document symbols' })
+            vim.keymap.set('n', '<leader>lw', builtin.lsp_workspace_symbols, { desc = 'Workspace symbols' })
+        end,
+    },
+
+    -- Treesitter
+    {
+        "nvim-treesitter/nvim-treesitter",
+        build = ":TSUpdate",
+        dependencies = {
+            "nvim-treesitter/nvim-treesitter-textobjects",
+            "nvim-treesitter/nvim-treesitter-context",
+        },
+        config = function()
+            require("nvim-treesitter.configs").setup({
+                ensure_installed = {
+                    "php", "phpdoc", "typescript", "javascript", "tsx",
+                    "sql", "bash", "fish", "dockerfile",
+                    "html", "css", "scss", "json", "yaml", "toml",
+                    "markdown", "markdown_inline", "lua", "vim", "vimdoc", "query",
+                    "git_config", "git_rebase", "gitcommit", "gitignore", "regex", "http",
+                },
+                sync_install = false,
+                auto_install = true,
+                highlight = { enable = true, additional_vim_regex_highlighting = false },
+                indent = { enable = true, disable = { "yaml" } },
+                incremental_selection = {
+                    enable = true,
+                    keymaps = {
+                        init_selection = "<C-space>",
+                        node_incremental = "<C-space>",
+                        scope_incremental = "<C-s>",
+                        node_decremental = "<M-space>",
+                    },
+                },
+                textobjects = {
+                    select = {
+                        enable = true,
+                        lookahead = true,
+                        keymaps = {
+                            ["af"] = "@function.outer",
+                            ["if"] = "@function.inner",
+                            ["ac"] = "@class.outer",
+                            ["ic"] = "@class.inner",
+                            ["aa"] = "@parameter.outer",
+                            ["ia"] = "@parameter.inner",
+                        },
+                    },
+                },
+            })
+
+            require("treesitter-context").setup({
+                enable = true,
+                max_lines = 3,
+                min_window_height = 0,
+                line_numbers = true,
+                multiline_threshold = 20,
+                trim_scope = 'outer',
+                mode = 'cursor',
+                zindex = 20,
+            })
+        end,
+    },
+    { 'echasnovski/mini.nvim', version = false },
+
+    -- Comments
+    {
+        'numToStr/Comment.nvim',
+        config = function()
+            require('Comment').setup({
+                padding = true,
+                sticky = true,
+                toggler = { line = 'gcc', block = 'gbc' },
+                opleader = { line = 'gc', block = 'gb' },
+                extra = { above = 'gcO', below = 'gco', eol = 'gcA' },
+                mappings = { basic = true, extra = true },
+            })
+
+            vim.keymap.set('n', '<leader>cc', function()
+                require('Comment.api').toggle.linewise.current()
+            end, { desc = 'Toggle comment line' })
+
+            vim.keymap.set('v', '<leader>cc', function()
+                local esc = vim.api.nvim_replace_termcodes('<ESC>', true, false, true)
+                vim.api.nvim_feedkeys(esc, 'nx', false)
+                require('Comment.api').toggle.linewise(vim.fn.visualmode())
+            end, { desc = 'Toggle comment selection' })
+        end,
+    },
+
+    -- Mason
+    {
+        "williamboman/mason.nvim",
+        config = function()
+            require("mason").setup({
+                ui = {
+                    icons = { package_installed = "✓", package_pending = "➜", package_uninstalled = "✗" }
+                }
+            })
+        end,
+    },
+
+    {
+        "williamboman/mason-lspconfig.nvim",
+        dependencies = { "mason.nvim" },
+        config = function()
+            require("mason-lspconfig").setup({
+                ensure_installed = {
+                    "phpactor", "ts_ls", "sqlls", "bashls", "dockerls",
+                    "docker_compose_language_service", "html", "cssls", "jsonls", "yamlls", "lua_ls",
+                },
+                automatic_installation = true,
+            })
+        end,
+    },
+
+    -- Formatting
+    {
+        "jay-babu/mason-null-ls.nvim",
+        dependencies = { "williamboman/mason.nvim", "nvimtools/none-ls.nvim" },
+        config = function()
+            require("mason-null-ls").setup({
+                ensure_installed = {
+                    "prettier", "php_cs_fixer", "shfmt", "sqlfluff",
+                    "eslint_d", "phpcs", "shellcheck",
+                },
+                automatic_installation = true,
+            })
+
+            local null_ls = require("null-ls")
+            null_ls.setup({
+                sources = {
+                    null_ls.builtins.formatting.prettier.with({
+                        filetypes = { "javascript", "typescript", "css", "html", "json", "yaml", "markdown" },
+                    }),
+                    null_ls.builtins.formatting.php_cs_fixer,
+                    null_ls.builtins.formatting.shfmt,
+                    null_ls.builtins.formatting.sqlfluff.with({ extra_args = { "--dialect", "mysql" } }),
+                    null_ls.builtins.diagnostics.eslint_d,
+                    null_ls.builtins.diagnostics.phpcs,
+                    null_ls.builtins.diagnostics.shellcheck,
+                    null_ls.builtins.diagnostics.sqlfluff.with({ extra_args = { "--dialect", "mysql" } }),
+                },
+            })
+
+            vim.keymap.set('n', '<leader>xf', function()
+                vim.lsp.buf.format({ async = true })
+            end, { desc = 'Format file' })
+        end,
+    },
+
+    -- LSP Configuration with Fixed Phpactor
+    {
+        "neovim/nvim-lspconfig",
+        dependencies = { "mason-lspconfig.nvim" },
+        config = function()
+            local lspconfig = require("lspconfig")
+            local capabilities = require("blink.cmp").get_lsp_capabilities()
+
+            local function on_attach(client, bufnr)
+                local opts = { noremap = true, silent = true, buffer = bufnr }
+                vim.keymap.set('n', 'gD', vim.lsp.buf.declaration, opts)
+                vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+                vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+                vim.keymap.set('n', 'gi', vim.lsp.buf.implementation, opts)
+                vim.keymap.set('n', '<C-k>', vim.lsp.buf.signature_help, opts)
+                vim.keymap.set('n', '<leader>D', vim.lsp.buf.type_definition, opts)
+                vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
+                vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
+                vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
+            end
+
+            -- Other language servers
+            lspconfig.ts_ls.setup({ capabilities = capabilities, on_attach = on_attach })
+            lspconfig.lua_ls.setup({
+                capabilities = capabilities,
+                on_attach = on_attach,
+                settings = {
+                    Lua = {
+                        runtime = { version = 'LuaJIT' },
+                        diagnostics = { globals = { 'vim' } },
+                        workspace = { library = vim.api.nvim_get_runtime_file("", true) },
+                        telemetry = { enable = false },
+                    },
+                },
+            })
+
+            local simple_servers = { "phpactor", "sqlls", "bashls", "dockerls", "docker_compose_language_service", "html",
+                "cssls", "jsonls", "yamlls" }
+            for _, server in ipairs(simple_servers) do
+                lspconfig[server].setup({ capabilities = capabilities, on_attach = on_attach })
+            end
+
+            -- Diagnostic configuration
+            vim.diagnostic.config({
+                virtual_text = { prefix = '●', source = "if_many" },
+                float = { source = "always" },
+                signs = true,
+                underline = true,
+                update_in_insert = false,
+                severity_sort = true,
+            })
+
+            local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
+            for type, icon in pairs(signs) do
+                local hl = "DiagnosticSign" .. type
+                vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+            end
+        end,
+    },
+
+    -- Debug Adapters
+    {
+        "mfussenegger/nvim-dap",
+        dependencies = { "rcarriga/nvim-dap-ui", "theHamsta/nvim-dap-virtual-text", "nvim-neotest/nvim-nio" },
+        config = function()
+            local dap = require("dap")
+            local dapui = require("dapui")
+
+            dapui.setup({
+                layouts = {
+                    {
+                        elements = { { id = "scopes", size = 0.25 }, "breakpoints", "stacks", "watches" },
+                        size = 40,
+                        position = "left",
+                    },
+                    { elements = { "repl", "console" }, size = 0.25, position = "bottom" },
+                },
+            })
+
+            require("nvim-dap-virtual-text").setup({ enabled = true })
+
+            dap.listeners.after.event_initialized["dapui_config"] = function() dapui.open() end
+            dap.listeners.before.event_terminated["dapui_config"] = function() dapui.close() end
+            dap.listeners.before.event_exited["dapui_config"] = function() dapui.close() end
+
+            -- PHP Debug
+            dap.adapters.php = {
+                type = 'executable',
+                command = 'node',
+                args = { vim.fn.stdpath('data') .. '/mason/packages/php-debug-adapter/extension/out/phpDebug.js' }
+            }
+            dap.configurations.php = {
+                { type = 'php', request = 'launch', name = 'Listen for Xdebug', port = 9003, log = false }
+            }
+
+            -- Debug keymaps
+            vim.keymap.set('n', '<leader>db', dap.toggle_breakpoint, { desc = "Toggle breakpoint" })
+            vim.keymap.set('n', '<leader>dc', dap.continue, { desc = "Continue" })
+            vim.keymap.set('n', '<leader>di', dap.step_into, { desc = "Step into" })
+            vim.keymap.set('n', '<leader>do', dap.step_over, { desc = "Step over" })
+            vim.keymap.set('n', '<leader>du', dapui.toggle, { desc = "Toggle DAP UI" })
+        end,
+    },
+
+    {
+        "jay-babu/mason-nvim-dap.nvim",
+        dependencies = { "mason.nvim", "nvim-dap" },
+        config = function()
+            require("mason-nvim-dap").setup({
+                ensure_installed = { "php-debug-adapter", "node-debug2-adapter", "bash-debug-adapter" },
+                automatic_installation = true,
+            })
+        end,
+    },
+
+    -- HTTP Client
+    {
+        "mistweaverco/kulala.nvim",
+        config = function()
+            require("kulala").setup({
+                default_timeout = 30000,
+                syntax_highlighting = { enabled = true },
+                winbar = { enabled = true },
+                display = { show_icons = true },
+            })
+
+            vim.keymap.set('n', '<leader>hr', function() require('kulala').run() end, { desc = "Run HTTP request" })
+            vim.keymap.set('n', '<leader>hh', function() require('kulala').toggle_view() end,
+                { desc = "Toggle HTTP response view" })
+
+            vim.api.nvim_create_autocmd("BufRead", {
+                pattern = "*.http",
+                callback = function() vim.bo.filetype = "http" end,
+            })
+        end,
+    },
+
+    -- Note-taking
+    {
+        "serenevoid/kiwi.nvim",
+        dependencies = { "nvim-lua/plenary.nvim" },
+        config = function()
+            require("kiwi").setup({
+                { name = "work",     path = vim.fn.expand("~/notes/work") },
+                { name = "personal", path = vim.fn.expand("~/notes/personal") },
+            })
+
+            vim.keymap.set('n', '<leader>nw', function() require('kiwi').open_wiki_index("work") end,
+                { desc = "Open work notes" })
+            vim.keymap.set('n', '<leader>np', function() require('kiwi').open_wiki_index("personal") end,
+                { desc = "Open personal notes" })
+            vim.keymap.set('n', '<leader>nt', function() require('kiwi').todo.toggle() end, { desc = "Toggle todo item" })
+            vim.keymap.set('n', '<leader>nd', function()
+                local date = os.date("%Y-%m-%d")
+                require('kiwi').open_wiki_index("work")
+                vim.cmd("edit " .. date .. ".md")
+            end, { desc = "Daily work note" })
+        end,
+    },
+
+    -- Completion
+    {
+        'saghen/blink.cmp',
+        dependencies = 'rafamadriz/friendly-snippets',
+        version = '*',
+        opts = {
+            keymap = { 
+                preset = 'default',
+                -- ['<Esc>'] = { 'hide', 'fallback'},
+                -- ['<C-c>'] = { 'hide', 'fallback'},
+                -- ['<C-y'] = { 'select_and_accept', 'hide' },
+            },
+            appearance = { use_nvim_cmp_as_default = true, nerd_font_variant = 'mono' },
+            sources = { default = { 'lsp', 'path', 'snippets', 'buffer' } },
+            completion = {
+                accept = { auto_brackets = { enabled = true } },
+                documentation = { auto_show = true, auto_show_delay_ms = 200 },
+                ghost_text = { enabled = vim.g.ai_cmp },
+            },
+        },
+        opts_extend = { "sources.default" }
+    },
+
+    -- AI Assistant
+    {
+        "olimorris/codecompanion.nvim",
+        dependencies = { "nvim-lua/plenary.nvim", "nvim-treesitter/nvim-treesitter", { "stevearc/dressing.nvim", opts = {} } },
+        config = function()
+            require("codecompanion").setup({
+                strategies = { chat = { adapter = "copilot" }, inline = { adapter = "copilot" } },
+                adapters = {
+                    copilot = function()
+                        return require("codecompanion.adapters").extend("copilot", {
+                            schema = { model = { default = "gpt-4o" } },
+                        })
+                    end,
+                },
+                auto_suggestions = true,
+            })
+
+            vim.keymap.set({ "n", "v" }, "<C-a>", "<cmd>CodeCompanionActions<cr>", { desc = "CodeCompanion actions" })
+            vim.keymap.set({ "n", "v" }, "<leader>ca", "<cmd>CodeCompanionChat Toggle<cr>", { desc = "Toggle AI chat" })
+            vim.cmd([[cab cc CodeCompanion]])
+        end,
+    },
+
+    {
+        "github/copilot.vim",
+        config = function()
+            vim.g.copilot_no_tab_map = true
+            vim.g.copilot_assume_mapped = true
+
+            vim.keymap.set("i", "<C-J>", 'copilot#Accept("")', { silent = true, expr = true, desc = "Accept Copilot" })
+            vim.keymap.set("i", "<C-\\>", "<Plug>(copilot-suggest)", { desc = "Suggest Copilot" })
+        end,
+    },
+
+    -- Git signs
+    {
+        "lewis6991/gitsigns.nvim",
+        config = function()
+            require('gitsigns').setup({
+                signs = {
+                    add = { text = '│' },
+                    change = { text = '│' },
+                    delete = { text = '_' },
+                    topdelete = { text = '‾' },
+                    changedelete = { text = '~' },
+                    untracked = { text = '┆' },
+                },
+                on_attach = function(bufnr)
+                    local gs = package.loaded.gitsigns
+                    vim.keymap.set('n', '<leader>gp', gs.preview_hunk, { buffer = bufnr, desc = "Preview hunk" })
+                    vim.keymap.set('n', ']c', function()
+                        if vim.wo.diff then return ']c' end
+                        vim.schedule(function() gs.next_hunk() end)
+                        return '<Ignore>'
+                    end, { expr = true, buffer = bufnr, desc = "Next hunk" })
+                end
+            })
+        end,
+    },
+
+    -- Status line
+    {
+        'nvim-lualine/lualine.nvim',
+        dependencies = { 'nvim-tree/nvim-web-devicons' },
+        config = function()
+            require('lualine').setup({
+                options = { theme = 'rose-pine' },
+                sections = {
+                    lualine_a = { 'mode' },
+                    lualine_b = { 'branch', 'diff', 'diagnostics' },
+                    lualine_c = { 'filename' },
+                    lualine_x = { 'encoding', 'fileformat', 'filetype' },
+                    lualine_y = { 'progress' },
+                    lualine_z = { 'location' }
+                },
+            })
+        end,
+    },
+
+    -- Terminal
+    {
+        "akinsho/toggleterm.nvim",
+        version = "*",
+        config = function()
+            require("toggleterm").setup({
+                size = 20,
+                open_mapping = [[<c-\>]],
+                direction = "float",
+                float_opts = { border = "curved" },
+            })
+
+            vim.keymap.set('n', '<leader>tt', '<cmd>ToggleTerm<cr>', { desc = "Toggle terminal" })
+            vim.keymap.set('n', '<leader>tf', '<cmd>ToggleTerm direction=float<cr>', { desc = "Float terminal" })
+        end,
+    },
+
+})
+
+-- =============================================================================
+-- ADDITIONAL KEYMAPS
+-- =============================================================================
+
+-- Basic navigation
+vim.keymap.set("v", "<M-j>", ":m '>+1<CR>gv=gv", { desc = "Move line down" })
+vim.keymap.set("v", "<M-k>", ":m '<-2<CR>gv=gv", { desc = "Move line up" })
+vim.keymap.set("n", "J", "mzJ`z", { desc = "Join lines" })
+vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = "Half page down" })
+vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = "Half page up" })
+
+-- Buffer management
+vim.keymap.set('n', '<leader>bx', '<cmd>bdelete<cr>', { desc = "Delete buffer" })
+vim.keymap.set('n', '<leader>bn', '<cmd>bnext<cr>', { desc = "Next buffer" })
+vim.keymap.set('n', '<leader>bp', '<cmd>bprevious<cr>', { desc = "Previous buffer" })
+
+-- Window management
+vim.keymap.set('n', '<C-h>', '<C-w>h', { desc = "Go to left window" })
+vim.keymap.set('n', '<C-j>', '<C-w>j', { desc = "Go to lower window" })
+vim.keymap.set('n', '<C-k>', '<C-w>k', { desc = "Go to upper window" })
+vim.keymap.set('n', '<C-l>', '<C-w>l', { desc = "Go to right window" })
+vim.keymap.set('n', '<leader>ws', '<C-w>s', { desc = "Split window horizontally" })
+vim.keymap.set('n', '<leader>wv', '<C-w>v', { desc = "Split window vertically" })
+
+-- LSP diagnostics
+vim.keymap.set('n', '<leader>le', vim.diagnostic.open_float, { desc = "Show diagnostic" })
+vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, { desc = "Previous diagnostic" })
+vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = "Next diagnostic" })
+vim.keymap.set("n", "<leader>qq", "<cmd>qa<cr>", { desc = "Quit all" })
+
+-- Auto-formatting on save
+vim.api.nvim_create_autocmd("BufWritePre", {
+    pattern = { "*.php", "*.ts", "*.js", "*.tsx", "*.jsx", "*.html", "*.css", "*.json", "*.yaml" },
+    callback = function()
+        vim.lsp.buf.format({ async = false })
+    end,
+})
+
+-- Phpactor specific commands for PHP files
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "php",
+    callback = function()
+        vim.keymap.set('n', '<leader>lm', '<cmd>PhpactorContextMenu<cr>',
+            { desc = "Phpactor context menu", buffer = true })
+        vim.keymap.set('n', '<leader>ln', '<cmd>PhpactorClassNew<cr>', { desc = "Create new class", buffer = true })
+        vim.keymap.set('n', '<leader>lu', '<cmd>PhpactorImportClass<cr>', { desc = "Import class", buffer = true })
+        vim.keymap.set('n', '<leader>la', '<cmd>PhpactorImportMissingClasses<cr>',
+            { desc = "Import missing classes", buffer = true })
+    end,
+})

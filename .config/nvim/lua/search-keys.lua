@@ -98,11 +98,11 @@ end
 
 function M.code_action(picker, picker_func, picker_func_params)
   vim.keymap.set("n", "<leader>ca", function()
-    if picker == nil then
+    -- if picker == nil then
       vim.lsp.buf.code_action()
-    else
-      picker[picker_func](picker_func_params)
-    end
+    -- else
+    --   picker[picker_func](picker_func_params)
+    -- end
   end, { desc = "Code actions" })
 end
 

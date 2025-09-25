@@ -2,6 +2,7 @@ return {
   -- File explorer
   "nvim-neo-tree/neo-tree.nvim",
   version = "v3.x",
+  enabled = false,
   dependencies = {
     "nvim-lua/plenary.nvim",
     "nvim-tree/nvim-web-devicons",
@@ -41,7 +42,7 @@ return {
     {
       "<leader>p",
       function()
-        require("neo-tree.command").execute({ toggle = true, reveal = true, dir = vim.loop.cwd() })
+        require("neo-tree.command").execute({ position = 'float', toggle = true, reveal = true, dir = vim.loop.cwd() })
       end,
       mode = "n",
       desc = "File explorer",

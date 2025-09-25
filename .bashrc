@@ -230,3 +230,4 @@ bind -m vi-command '"\C-v": "\C-z\C-v\C-z"'
 bind -m vi-insert '"\C-v": "\C-z\C-v\C-z"'
 
 source <(kubectl completion bash)
+export PATH=$HOME/.local/bin:$PATH

@@ -2,8 +2,8 @@
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
 -- vim.keymap.set("n", "<leader>gr", ':let @+ = expand("%:p:h").":".line(".")<CR>')
-vim.keymap.set("x", "<leader>p", [["_dP]])
-vim.keymap.set("n", "<leader>p", '<cmd>:Ex<CR>')
+-- vim.keymap.set("x", "<leader>p", [["_dP]])
+-- vim.keymap.set("n", "<leader>p", '<cmd>:Ex<CR>')
 vim.keymap.set({ "n", "v" }, "<leader>gr", "<cmd>PHPCopyMethodReference<CR>")
 
 

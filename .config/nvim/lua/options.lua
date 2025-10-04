@@ -102,4 +102,3 @@ vim.opt.backup = false
 vim.opt.isfname:append("@-@")
 vim.o.winborder = "rounded"
 vim.o.showmode = true
-vim.cmd("colorscheme default")

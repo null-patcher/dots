@@ -31,7 +31,9 @@ return { -- Collection of various small independent plugins/modules
     --   return "%2l:%-2v"
     -- end
 
-    -- vim.cmd.colorscheme("minischeme")
+    -- vim.cmd.colorscheme("slate")
+    -- vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+    -- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
     -- ... and there is more!
     --  Check out: https://github.com/echasnovski/mini.nvim
   end,

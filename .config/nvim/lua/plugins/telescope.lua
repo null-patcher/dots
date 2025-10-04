@@ -52,7 +52,7 @@ return { -- Fuzzy Finder (files, lsp, etc)
           -- Ivy theme specific options
           height = 10,
           previewer = true, -- Optional: customize the UI
-          border = false,
+          border = true,
           -- layout_strategy = "vertical",
           -- layout_config = {
           --   preview_width = 0.6,

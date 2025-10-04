@@ -1,7 +1,7 @@
 theme=Hybrid
 app-notifications=false
-# background-opacity=0.9
-font-size=15
+background-opacity=0.8
+font-size=16
 window-padding-y=4
 window-padding-x=6
 window-padding-balance=true
@@ -9,6 +9,7 @@ copy-on-select=clipboard
 font-feature=-calt
 font-feature=-liga
 font-feature=-dlig
+shell-integration-features=no-cursor
 keybind = ctrl+alt+h=goto_split:left
 keybind = ctrl+alt+j=goto_split:down
 keybind = ctrl+alt+k=goto_split:up

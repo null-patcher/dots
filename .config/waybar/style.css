@@ -3,14 +3,15 @@
 * {
   /* font-family: FantasqueSansMono Nerd Font Proto; */
   font-family: 'JetBrainsMono NerdFont Propo';
-  font-size: 15px;
+  font-size: 13px;
+  font-weight: 900;
   min-height: 0;
 }
 
 #waybar {
   background: transparent;
   color: @text;
-  margin: 5px 5px;
+  /* margin: 5px 5px; */
 }
 
 #workspaces {

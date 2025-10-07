@@ -4,3 +4,4 @@
 .vim-arsync.bkp
 .config/zsh/zsh-syntax-highlighting
 .config/zsh/plugins/zsh-autosuggestions
+http-client.env.json

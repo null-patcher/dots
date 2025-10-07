@@ -67,7 +67,7 @@ vim.opt.updatetime = 49
 
 -- Decrease mapped sequence wait time
 -- Displays which-key popup sooner
-vim.opt.timeoutlen = 250
+vim.opt.timeoutlen = 300
 
 -- Configure how new splits should be opened
 vim.opt.splitright = true
@@ -102,3 +102,4 @@ vim.opt.backup = false
 vim.opt.isfname:append("@-@")
 vim.o.winborder = "rounded"
 vim.o.showmode = true
+vim.o.cmdheight = 1

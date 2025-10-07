@@ -33,18 +33,18 @@ return {
       })
     end,
   },
-  {
-    "zbirenbaum/copilot-cmp",
-    dependencies = {
-      "zbirenbaum/copilot.lua",
-    },
-    config = function()
-      require("copilot_cmp").setup({
-        -- event = { "InsertEnter", "LspAttach" },
-        fix_pairs = true,
-      })
-    end,
-  },
+  -- {
+  --   "zbirenbaum/copilot-cmp",
+  --   dependencies = {
+  --     "zbirenbaum/copilot.lua",
+  --   },
+  --   config = function()
+  --     require("copilot_cmp").setup({
+  --       -- event = { "InsertEnter", "LspAttach" },
+  --       fix_pairs = true,
+  --     })
+  --   end,
+  -- },
   {
     "folke/which-key.nvim",
     optional = true,

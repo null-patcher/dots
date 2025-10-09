@@ -1,6 +1,6 @@
 [user]
 	name = Robert Piringiu
-	email = robert.piringiu@emag.ro
+	email =
 [core]
 	excludesfile = ~/.gitignore
 # clearly makes git better

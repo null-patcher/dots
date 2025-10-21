@@ -3,6 +3,7 @@ return {
     'kristijanhusak/vim-dadbod-ui',
     dependencies = {
       { 'tpope/vim-dadbod', lazy = true },
+      { 'tpope/vim-dotenv', lazy = true },
       { 'kristijanhusak/vim-dadbod-completion', ft = { 'sql', 'mysql', 'plsql' }, lazy = true },
     },
     cmd = {
@@ -22,7 +23,7 @@ return {
       sources = {
         default = { "lsp", "path", "snippets", "buffer" },
         per_filetype = {
-          sql = { 'snippets', 'dadbod', 'buffer' },
+          sql = { 'dadbod', 'buffer' },
         },
         -- add vim-dadbod-completion to your completion providers
         providers = {

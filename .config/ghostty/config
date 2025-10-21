@@ -1,7 +1,7 @@
-theme=Hybrid
+theme=Aura
 app-notifications=false
 background-opacity=0.8
-font-size=16
+font-size=13
 window-padding-y=4
 window-padding-x=6
 window-padding-balance=true

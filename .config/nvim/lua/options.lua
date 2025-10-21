@@ -103,3 +103,7 @@ vim.opt.isfname:append("@-@")
 vim.o.winborder = "rounded"
 vim.o.showmode = true
 vim.o.cmdheight = 1
+vim.o.foldmethod="manual"
+vim.o.foldlevel=100
+
+

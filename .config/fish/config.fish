@@ -6,6 +6,7 @@ set -g fish_key_bindings fish_vi_key_bindings
 bind -M insert ctrl-c kill-whole-line repaint
 
 fzf --fish | source
+set -gx EDITOR nvim
 
 alias lg="lazygit"
 

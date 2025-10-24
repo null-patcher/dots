@@ -141,6 +141,9 @@ return { -- Fuzzy Finder (files, lsp, etc)
   },
   {
     "nvim-telescope/telescope-ui-select.nvim",
+    cond = function()
+      return vim.g.picker == "Telescope"
+    end,
     config = function()
       require("telescope").setup({
         extensions = {

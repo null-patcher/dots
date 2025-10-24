@@ -6,7 +6,7 @@ vim.o.smartindent = true
 vim.o.tabstop = 4
 vim.o.shiftwidth = 4
 vim.o.background = "dark"
-vim.g.picker = "Telescope"
+vim.g.picker = "FzfLua"
 
 vim.g.mapleader = " "
 vim.g.netrw_liststyle = 3

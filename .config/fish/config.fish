@@ -13,7 +13,7 @@ alias lg="lazygit"
 alias vpn="sudo openfortivpn -c ~/.config/emag-forti.conf --saml-login"
 
 function fzf_cd_dir
-    set -l dir (fd -t d . 2>/dev/null | fzf --height 40% --reverse --select-1 --exit-0)
+    set -l dir (fd . $HOME --type directory 2>/dev/null | fzf --height 40% --reverse --select-1 --exit-0)
     if test -n "$dir"
         cd "$dir"
         commandline -f repaint
@@ -21,7 +21,7 @@ function fzf_cd_dir
 end
 
 function fzf_vim_dir
-    set -l dir (fd -t d . 2>/dev/null | fzf --height 40% --reverse --select-1 --exit-0)
+    set -l dir (fd . $HOME --type directory 2>/dev/null | fzf --height 40% --reverse --select-1 --exit-0)
     if test -n "$dir"
         cd "$dir"
         commandline -f repaint

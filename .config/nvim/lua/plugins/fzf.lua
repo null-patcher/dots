@@ -66,7 +66,7 @@ return {
     keymaps.oldfiles(fzflua, "oldfiles", {})
     keymaps.buffers(fzflua, "buffers", {})
     keymaps.lines(fzflua, "lines", {})
-    keymaps.files(fzflua, "files", {})
+    keymaps.files(fzflua, "files", {hidden=true, no_ignore=false})
     keymaps.help(fzflua, "helptags", {})
     keymaps.keymaps(fzflua, "keymaps", {})
     keymaps.search_cword(fzflua, "grep_cword", {})

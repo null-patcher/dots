@@ -1,4 +1,3 @@
-
 local IS_DEV = false
 
 local prompts = {
@@ -25,13 +24,10 @@ return {
     "zbirenbaum/copilot.lua",
     cmd = "Copilot",
     event = "InsertEnter",
-    config = function()
-      require("copilot").setup({
-        suggestion = { enabled = false },
-        panel = { enabled = false },
-        copilot_model = "claude-4-sonnet",
-      })
-    end,
+    opts = {
+      suggestion = { enabled = false },
+      panel = { enabled = false },
+    },
   },
   -- {
   --   "zbirenbaum/copilot-cmp",

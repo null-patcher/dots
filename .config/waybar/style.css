@@ -6,11 +6,12 @@
   font-size: 13px;
   font-weight: 900;
   min-height: 0;
+  color: #ffffff;
 }
 
 #waybar {
   background: transparent;
-  color: @text;
+  /* color: @text; */
   /* margin: 5px 5px; */
 }
 
@@ -28,13 +29,13 @@
 }
 
 #workspaces button.active {
-  color: @sky;
+  /* color: @sky; */
   border-radius: 1rem;
   background-color: @surface2;
 }
 
 #workspaces button:hover {
-  color: @sapphire;
+  /* color: @sapphire; */
   border-radius: 1rem;
 }
 
@@ -53,26 +54,26 @@
 }
 
 #clock {
-  color: @blue;
+  /* color: @blue; */
   border-radius: 1rem 1rem 1rem 1rem;
   margin-right: 1rem;
 }
 
 #battery {
-  color: @green;
+  /* color: @green; */
   /* border-radius: 0px 1rem 1rem 0px; */
 }
 
 #battery.charging {
-  color: @green;
+  /* color: @green; */
 }
 
 #battery.warning:not(.charging) {
-  color: @red;
+  /* color: @red; */
 }
 
 #backlight {
-  color: @yellow;
+  /* color: @yellow; */
 }
 
 #backlight, #battery {
@@ -80,25 +81,25 @@
 }
 
 #pulseaudio {
-  color: @maroon;
+  /* color: @maroon; */
   /* border-radius: 1rem 0px 0px 1rem; */
   margin-left: 0.1rem;
 }
 
 #custom-music {
-  color: @mauve;
+  /* color: @mauve; */
   border-radius: 1rem;
 }
 
 #custom-lock {
     border-radius: 1rem 0px 0px 1rem;
-    color: @lavender;
+    /* color: @lavender; */
 }
 
 #custom-power {
     margin-right: 1rem;
     /* border-radius: 0px 1rem 1rem 0px; */
-    color: @red;
+    /* color: @red; */
 }
 
 #tray {

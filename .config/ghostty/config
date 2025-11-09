@@ -1,10 +1,11 @@
 theme=Adwaita Dark
 app-notifications=false
 background-opacity=0.8
-font-size=13
+font-size=14
 window-padding-y=4
 window-padding-x=6
 window-padding-balance=true
+window-decoration=false
 copy-on-select=clipboard
 keybind = ctrl+alt+h=goto_split:left
 keybind = ctrl+alt+j=goto_split:down

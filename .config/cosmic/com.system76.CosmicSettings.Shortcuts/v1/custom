@@ -1,8 +1,0 @@
-{
-    (
-        modifiers: [
-            Super,
-        ],
-        key: "s",
-    ): ToggleSticky,
-}

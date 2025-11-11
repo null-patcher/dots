@@ -37,3 +37,8 @@ bind -M insert  \cf fzf_cd_dir
 bind -M default \cv fzf_vim_dir
 bind -M insert  \cv fzf_vim_dir
 fish_add_path $HOME/.local/bin
+load_nvm > /dev/null
+set -gx GOROOT $HOME/code/personal/go
+mkdir -p $HOME/.local/go
+set -gx GOPATH $HOME/.local/go
+set -gx PATH $PATH $GOROOT/bin/ 

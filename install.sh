@@ -23,3 +23,10 @@ sudo dnf install dunst wofi fzf fd
 sudo dnf install https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm -y
 sudo dnf config-manager setopt fedora-cisco-openh264.enabled=1
 sudo dnf install steam gamescope -y
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+curl -sL https://raw.githubusercontent.com/jorgebucaran/fisher/main/functions/fisher.fish | source && fisher install jorgebucaran/fisher
+fisher install edc/bass
+nvm install stable && nvm use stable
+sudo dnf install yarnpkg
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+
